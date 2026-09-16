@@ -1,0 +1,39 @@
+---
+title: 'Assignment 3A - Global Baseline Estimate: Approach'
+author: "Lakeranie Boodram"
+date: "2026-09-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+For this assignment, I will use the movie-rating survey data collected in the previous assignment to develop a recommendation system using the Global Baseline Estimate method. The purpose of this method is to estimate a rating for a movie that a participant did not rate by considering the overall rating behavior of the group, the popularity of the movie, and the rating behavior of the individual participant.
+
+My dataset contains ratings from five participants across six movies. One rating is missing because Person 2 did not provide a rating for American Gangster. I plan to use the Global Baseline Estimate algorithm to estimate this missing rating.
+
+## Planned Approach
+
+I will first import or recreate the movie-rating dataset in R and represent the missing rating as NA. I will then calculate the global mean, which is the average of all available ratings in the dataset while excluding the missing value.
+
+Next, I will calculate the average rating for each movie. This will allow me to determine the movie bias, which represents how much a particular movie’s average rating differs from the global average.
+
+I will also calculate the average rating for each participant. This will be used to determine the user bias, which represents whether a participant generally gives ratings above or below the overall average.
+
+The Global Baseline Estimate will then be calculated using the following formula:
+
+Predicted Rating = Global Mean + Movie Bias + User Bias
+
+For this assignment, I will apply this calculation to estimate Person 2’s missing rating for American Gangster. Since the original survey uses a 1-to-5 rating scale, I will also check that the predicted value remains within that range.
+
+## Anticipated Data Challenges
+
+One of the difficulties involves the correct treatment of the missing value. I will not assume the missing value to be equal to zero because zero is not part of the rating system. Rather, I will opt for using NA and make sure that R removes the missing value while calculating the average scores.
+
+
+The problem with the data used is that since the sample size is small, having a small number of observations may mean that each of the ratings provided by each participant has a significant impact on the ratings around the average.
+
+Finally, I will also check if the values being used in the calculations are numeric.
