@@ -1,0 +1,38 @@
+---
+title: "Assignment 3B Window Functions: Approach"
+author: "Lakeranie Boodram"
+date: "2026-09-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction
+
+For this assignment, I plan to use historical stock price data to demonstrate the use of window functions with time-series data. The dataset will contain daily prices for multiple stocks beginning January 1, 2022. Using more than one stock will allow me to calculate the required statistics separately for each company and compare how the values change over time.
+
+# Data Source
+
+The historical information on stock price will be sourced from Yahoo Finance. The intention is to use the information daily stock prices of Apple (AAPL) and Microsoft (MSFT) from January 1, 2022. The information will be imported into R and analyzed by means of `dplyr`.
+
+# Planned Approach
+
+I plan to complete the analysis in R using RStudio and the `dplyr` package. The data will first be organized so that each observation contains a date, stock symbol, and daily stock price. I will make sure the dates are stored correctly and that the observations are sorted by stock and date before performing the calculations.
+
+For each stock, I will calculate a year-to-date average of the daily price. This will require grouping the data by stock and year so that the average begins again at the start of each year.
+
+I will also calculate a six-day moving average for each stock. The moving average will use the current day's price together with the previous five observations. This will allow short-term price changes to be smoothed and compared with the original daily prices.
+
+After the calculations are completed, I plan to review the results to make sure that the window calculations are being performed independently for each stock.
+
+# Anticipated Data Challenges
+
+One challenge may be missing dates because stock markets are not open every day. Weekends and market holidays will create gaps in the calendar dates. Because of this, the six-day moving average will be based on six available trading days rather than six consecutive calendar days.
+
+Another challenge may involve missing values or incomplete price observations. I will check the dataset for missing data before calculating the averages.
+
+The data will also need to be ordered correctly by stock symbol and date. If the observations are not sorted properly, the moving-average calculation could use the wrong observations.
+
+Finally, the year-to-date calculation must restart for each stock at the beginning of every year. I will need to group the data correctly so that values from different stocks or different years are not combined.
