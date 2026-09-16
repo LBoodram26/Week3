@@ -1,0 +1,125 @@
+---
+title: 'Assignment 3A Global Baseline Estimate: Code Base'
+author: "Lakeranie Boodram"
+date: "2026-09-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Introduction
+
+In this assignment, I will implement a Global Baseline Estimate recommendation system using the movie-rating survey data collected in the previous assignment. The goal is to use the available ratings to estimate the missing rating for Person 2's rating of American Gangster.
+
+The Global Baseline Estimate considers the overall average rating, the average rating of the movie, and the rating behavior of the individual participant.
+
+## Movie Rating Data
+
+```{r movie-data}
+movie_ratings <- data.frame(
+  Person = c("Person 1", "Person 2", "Person 3", "Person 4", "Person 5"),
+  American_Gangster = c(5, NA, 5, 4, 5),
+  Moana_2 = c(4, 5, 4, 4, 5),
+  Annie = c(3, 4, 4, 3, 4),
+  John_Wick = c(5, 5, 4, 5, 5),
+  Deadpool_Wolverine = c(4, 4, 5, 5, 4),
+  Lilo_Stitch = c(4, 3, 4, 5, 4)
+)
+
+movie_ratings
+```
+## Participant Average Ratings
+
+```{r participant-averages}
+
+participant_averages <- rowMeans(
+  movie_ratings[, 2:7],
+  na.rm = TRUE
+)
+names(participant_averages) <- movie_ratings$Person
+participant_averages
+```
+
+## Movie Average Ratings
+
+```{r movie-averages}
+movie_averages <- colMeans(
+  movie_ratings[, 2:7],
+  na.rm = TRUE
+)
+
+movie_averages
+```
+
+## Global Mean Rating
+```{r global-mean}
+global_mean <- mean(
+  unlist(movie_ratings[, 2:7]),
+  na.rm = TRUE
+)
+
+global_mean
+```
+## Bias Calculations
+```{r bias-calculations}
+# Movie bias for American Gangster
+american_gangster_bias <- movie_averages["American_Gangster"] - global_mean
+
+# User bias for Person 2
+person2_bias <- participant_averages["Person 2"] - global_mean
+
+american_gangster_bias
+person2_bias
+```
+
+## Global Baseline Estimate
+
+```{r global-baseline-estimate}
+predicted_rating <- global_mean +
+  american_gangster_bias +
+  person2_bias
+
+predicted_rating
+```
+
+## Conclusion
+
+Using the Global Baseline Estimate method, the predicted rating for Person 2 on American Gangster is approximately 4.64 out of 5.
+
+The estimate was calculated by combining the global mean rating, the movie bias for American Gangster, and the user bias for Person 2. Based on the predicted rating of approximately 4.64 out of 5, the Global Baseline Estimate would recommend American Gangster to Person 2.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
