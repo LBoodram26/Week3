@@ -1,0 +1,146 @@
+---
+title: 'Assignment 3B Window Functions: Code Base'
+author: "Lakeranie Boodram"
+date: "2026-09-16"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{R}
+# Install these only if you do not already have them
+# install.packages("tidyquant")
+# install.packages("dplyr")
+# install.packages("lubridate")
+# install.packages("ggplot2")
+
+library(tidyquant)
+library(dplyr)
+library(lubridate)
+library(ggplot2)
+```
+```{R}
+stocks <- tq_get(
+  c("AAPL", "MSFT"),
+  from = "2022-01-01"
+)
+
+head(stocks)
+```
+```{r}
+stock_data <- stocks %>%
+  select(symbol, date, adjusted) %>%
+  arrange(symbol, date) %>%
+  mutate(year = year(date))
+
+head(stock_data)
+```
+
+```{r}
+stock_data <- stock_data %>%
+  group_by(symbol, year) %>%
+  mutate(
+    ytd_average = cummean(adjusted)
+  ) %>%
+  ungroup()
+
+head(stock_data, 10)
+```
+
+
+```{r}
+stock_data <- stock_data %>%
+  group_by(symbol) %>%
+  arrange(date, .by_group = TRUE) %>%
+  mutate(
+    cumulative_price = cumsum(adjusted),
+    six_day_average = if_else(
+      row_number() >= 6,
+      (cumulative_price - lag(cumulative_price, 6, default = 0)) / 6,
+      NA_real_
+    )
+  ) %>%
+  ungroup()
+
+head(stock_data, 10)
+```
+
+```{r}
+stock_results <- stock_data %>%
+  select(
+    symbol,
+    date,
+    adjusted,
+    ytd_average,
+    six_day_average
+  )
+
+head(stock_results, 20)
+```
+```{r}
+ggplot(stock_results, aes(x = date)) +
+  geom_line(aes(y = adjusted, linetype = "Daily Price")) +
+  geom_line(aes(y = six_day_average,
+                linetype = "6-Day Moving Average")) +
+  facet_wrap(~ symbol, scales = "free_y") +
+  labs(
+    title = "Daily Stock Price and 6-Day Moving Average",
+    x = "Date",
+    y = "Adjusted Stock Price",
+    linetype = "Series"
+  ) +
+  theme_minimal()
+```
+
+# Interpretation
+
+The 6-day moving average follows the overall direction of the daily stock price while smoothing some of the short-term fluctuations. Since the moving average uses the current trading day and the previous five trading days, it changes more gradually than the daily adjusted price.
+
+The results for Apple and Microsoft are calculated separately because the data is grouped by stock symbol. The first five observations for each stock do not have a 6-day moving average because there are not yet six trading days available for the calculation.
+
+```{r}
+ggplot(stock_results, aes(x = date)) +
+  geom_line(aes(y = adjusted, linetype = "Daily Price")) +
+  geom_line(aes(y = ytd_average,
+                linetype = "Year-to-Date Average")) +
+  facet_wrap(~ symbol, scales = "free_y") +
+  labs(
+    title = "Daily Stock Price and Year-to-Date Average",
+    x = "Date",
+    y = "Adjusted Stock Price",
+    linetype = "Series"
+  ) +
+  theme_minimal()
+```
+
+
+# Year-to-Date Interpretation
+
+The year-to-date average shows the average adjusted stock price from the beginning of each year through each trading day. Because the data is grouped by stock symbol and year, the calculation restarts at the beginning of every new year for both Apple and Microsoft.
+
+Compared with the daily stock price, the year-to-date average changes more gradually because it includes all previous trading days within the same year.
+
+
+# Sources
+
+Yahoo Finance. Historical stock price data for Apple Inc. (AAPL) and Microsoft Corporation (MSFT). The stock price data used in this assignment was accessed through the `tidyquant` package.
+https://finance.yahoo.com/
+
+Business Science. `tidyquant` documentation: `tq_get()` for retrieving stock prices and other financial data in R.
+https://business-science.github.io/tidyquant/reference/tq_get.html
+
+Posit / tidyverse. `dplyr` Window Functions documentation. This resource was used for the year-to-date average and the 6-day moving average calculations using functions such as `cummean()`, `cumsum()`, `lag()`, and `row_number()`.
+https://dplyr.tidyverse.org/articles/window-functions.html
+
+Posit / tidyverse. `dplyr` Grouped Data documentation. This resource was used for grouping the stock data by stock symbol and year.
+https://dplyr.tidyverse.org/articles/grouping.html
+
+Posit / tidyverse. `lubridate` `year()` documentation. This function was used to extract the year from each stock price date.
+https://lubridate.tidyverse.org/reference/year.html
+
+Posit / tidyverse. `ggplot2` `facet_wrap()` documentation. This resource was used to create separate Apple and Microsoft panels in the stock price graphs.
+https://ggplot2.tidyverse.org/reference/facet_wrap.html
+
+
